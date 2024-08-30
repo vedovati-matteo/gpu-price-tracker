@@ -1,0 +1,17 @@
+{
+  "name": "pricecompare",
+  "version": "1.0.0",
+  "description": "This project is a work in progress. It aims to scrape product price data from MediaWorld and eBay, store it in a MongoDB database, and present it in a user-friendly web interface for easy comparison.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "mongodb": "^6.8.0",
+    "puppeteer": "^23.2.1"
+  }
+}
