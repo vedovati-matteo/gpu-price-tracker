@@ -1,6 +1,6 @@
 const Price = require('../models/price');
 
-async function addDailyProductPrices(productId, sourceId, options) {
+async function addDailyProductPrices(productId, source, options) {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Set time to midnight for consistent daily checks
@@ -8,7 +8,7 @@ async function addDailyProductPrices(productId, sourceId, options) {
       // Check if prices for today already exist
       const existingPrice = await Price.findOne({
         productId,
-        sourceId,
+        source,
         date: today
       });
   
@@ -21,7 +21,7 @@ async function addDailyProductPrices(productId, sourceId, options) {
         // Create new price entry
         const newPrice = new Price({
           productId,
-          sourceId,
+          source,
           date: today,
           options
         });
@@ -34,11 +34,11 @@ async function addDailyProductPrices(productId, sourceId, options) {
     }
 }
 
-async function getProductPrices(productId, sourceId = null, date = null) {
+async function getProductPrices(productId, source = null, date = null) {
     try {
       const query = { productId };
-      if (sourceId) {
-        query.sourceId = sourceId;
+      if (source) {
+        query.source = source;
       }
       if (date) {
         query.date = date;

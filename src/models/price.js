@@ -6,8 +6,8 @@ const priceSchema = new mongoose.Schema({
     ref: 'Product', // Reference to the Product model
     required: true 
   },
-  sourceId: { 
-    type: mongoose.Schema.Types.ObjectId, 
+  source: { 
+    type: mongoose.Schema.Types.String, 
     ref: 'Source',  // Reference to the Source model
     required: true 
   },

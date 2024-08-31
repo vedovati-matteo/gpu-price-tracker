@@ -1,8 +1,15 @@
 const trackProductPrice = require('./services/priceTrackingService');
 
 async function main() {
-    const productUrl = 'https://www.example-product-page.com'; 
-    await trackProductPrice(productUrl);
+    
+    const result = await trackProductPrice();
+
+    if (result) {
+        console.log('Price tracking completed successfully');
+    } else {
+        console.error('Error during price tracking');
+    }
+
 }
 
 main().catch(console.error);
