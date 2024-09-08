@@ -24,6 +24,7 @@ RUN apt-get update && \
     xdg-utils \
     libu2f-udev \
     libvulkan1 \
+    xvfb x11vnc x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable x11-apps \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
@@ -40,7 +41,8 @@ RUN npm install
 COPY . .
 
 # Expose the port the app runs on (optional, depending on your app)
-# EXPOSE 3000
+EXPOSE 3000
+EXPOSE 9222
 
 # Start the app
-CMD [ "node", "src/standaloneScraper.js" ]
+CMD Xvfb :99 -ac & x11vnc -forever -nopw -display :99 & DISPLAY=:99 node src/server.js

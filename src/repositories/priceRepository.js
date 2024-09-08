@@ -13,21 +13,35 @@ async function addDailyProductPrices(productId, source, options) {
       });
   
       if (existingPrice) {
-        // Update existing prices
-        existingPrice.options = options;
+        // Check if any of the new options have different conditions than existing ones
+        const newConditions = new Set(options.map(option => option.condition));
+        const existingConditions = new Set(existingPrice.options.map(option => option.condition));
+
+        const hasNewConditions = [...newConditions].some(condition => !existingConditions.has(condition));
+
+        if (hasNewConditions) {
+            // Add new options with different conditions
+            existingPrice.options = existingPrice.options.concat(
+                options.filter(option => !existingConditions.has(option.condition))
+            );
+        } else {
+            // Update existing options if conditions match
+            existingPrice.options = options;
+        }
+
         await existingPrice.save();
         console.log('Prices updated for today');
-      } else {
+    } else {
         // Create new price entry
         const newPrice = new Price({
-          productId,
-          source,
-          date: today,
-          options
+            productId,
+            source,
+            date: today,
+            options
         });
         await newPrice.save();
         console.log('New prices added for today');
-      }
+    }
     } catch (err) {
       console.error('Error adding/updating daily product prices:', err);
       throw err; 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const priceSchema = new mongoose.Schema({
   productId: { 
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.String, 
     ref: 'Product', // Reference to the Product model
     required: true 
   },
@@ -16,9 +16,10 @@ const priceSchema = new mongoose.Schema({
     {
       name: { type: String, required: true },
       price: { type: Number, required: true },
-      href: { type: String, required: true }
+      href: { type: String, required: true },
+      condition: { type: String, required: true },
     }
   ]
 });
 
-module.exports = mongoose.model('Source', priceSchema);
+module.exports = mongoose.model('Price', priceSchema);

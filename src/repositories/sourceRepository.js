@@ -10,6 +10,21 @@ async function getSources() {
   }
 }
 
+async function getSource(sourceName) {
+  try {
+    const source = await Source.findOne({ source: sourceName });
+    
+    if (!source) {
+      throw new Error(`Source with name '${sourceName}' not found`); 
+    }
+
+    return source;
+  } catch (err) {
+    console.error('Error getting source:', err);
+    throw err; 
+  }
+}
+
 async function addSource(sourceData) {
   try {
     const newSource = new Source(sourceData);
@@ -23,5 +38,6 @@ async function addSource(sourceData) {
 
 module.exports = {
   getSources,
+  getSource,
   addSource
 };

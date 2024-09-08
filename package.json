@@ -10,8 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.7.7",
     "dotenv": "^16.0.0",
+    "express": "^4.19.2",
     "mongodb": "^6.8.0",
-    "puppeteer": "^23.2.1"
+    "mongoose": "^8.6.0",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^23.2.1",
+    "puppeteer-screen-recorder": "^3.0.5"
   }
 }

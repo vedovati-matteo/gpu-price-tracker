@@ -1,45 +1,37 @@
-const puppeteer = require('puppeteer');
+const { humanScroll } = require('../utils/humanActionsUtils');
 
-async function scrapeMediaworld(product) {
-    console.log('>>>> Starting Mediaworld scraper for ', product.name,' <<<<');
-
+function getMediaworldUrl(product) {
     const baseUrl = 'https://www.mediaworld.it/it';
     const videoCardsAddress = '/category/schede-video-200302.html';
     // Format: NVIDIA%20GeForce%20RTX%204070%20SUPER, NVIDIA%20GeForce%20RTX%204070%20TI
     const encodedName = product.name.replace(/ /g, '%20');
     const searchUrl = `${baseUrl}${videoCardsAddress}?filter=graphicsCard:${encodedName}`
-    
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] }); // { headless: true } for headless mode
-    const page = await browser.newPage();
 
-    // Set the viewport to a typical desktop resolution (1920x1080)
-    await page.setViewport({ width: 1920, height: 1080 });
+    return [searchUrl];
+}
 
-    // Set the user agent to a typical desktop browser
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3');
-
-    try {
-        await page.goto(searchUrl);
-    } catch (error) {
-        console.error('> Error loading the page:', error);
-        await browser.close();
-        return [];
-    }
+async function scrapeMediaworld(product, page, condition) {
+    console.log('>>>> Starting Mediaworld scraper for ', product.name,' <<<<');
     
     let options = [];
     let pageNum = 1
+    const currentURL = await page.url();
+    await page.keyboard.press('Enter');
+
     while (true) {
         console.log('> ', pageNum,' loading page');
         try {
-            await page.goto(searchUrl + `&page=${pageNum}`);
+            await page.goto(currentURL + `&page=${pageNum}`, { timeout: 10000, waitUntil: 'networkidle2' });
         } catch (error) {
-            console.error('> Error loading the page:', error);
-            await browser.close();
-            return [];
+            console.error('> Timeout exceeded');
         }
         console.log('> ', pageNum,' page laoded');
-        
-        // check if there are options on the page
+
+        console.log('>', pageNum, 'scrolling to the bottom of the page');
+        await humanScroll(page, 60000); // scroll to the bottom of the page or until 30 seconds have passed
+        console.log('>', pageNum, 'scrolled to the bottom of the page');
+
+
         try {
             await page.waitForFunction(() => {
                 const optionsCount = document.querySelector('div[data-test="mms-search-srp-productlist"]').children.length;
@@ -50,35 +42,19 @@ async function scrapeMediaworld(product) {
             break;
         }
 
-        // scroll to the bottom of the page
-        await page.evaluate(async () => {
-            let previousHeight;
-            try {
-                while (true) {
-                previousHeight = document.body.scrollHeight;
-                window.scrollTo(0, document.body.scrollHeight);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            
-                // Check if the scroll height has increased significantly
-                if (Math.abs(document.body.scrollHeight - previousHeight) < 50) {
-                    break; 
-                }
-                }
-            } catch (error) {
-                console.error('> ', pageNum, ' Error during scrolling:', error);
-            }
-        });
-        console.log('> ', pageNum, ' scrolled to the bottom of the page');
-
         // get the option of the product
         const pageOptions = await page.evaluate(() => {
             const optionsCards = document.querySelector('div[data-test="mms-search-srp-productlist"]').children;
+
+            if (optionsCards.length === 0) {
+                return [];
+            }
 
             return Array.from(optionsCards).map(card => {
                 let price = null;
                 let largestFontSize = 0;
 
-                const title = card.querySelector('p[data-test="product-title"]').textContent;
+                const name = card.querySelector('p[data-test="product-title"]').textContent;
                 const href = card.querySelector('a').href;
                 const priceDiv = card.querySelector('div[data-test*="product-price"]');
                 if (priceDiv) { 
@@ -95,9 +71,14 @@ async function scrapeMediaworld(product) {
                 } else {
                     price = NaN; // Or any other suitable placeholder
                 }
-                return {title, price, href};
+                return {name, price, href};
             });
         });
+
+        if (pageOptions.length === 0) {
+            console.log('> ', pageNum, ' No more options');
+            break;
+        }
 
         console.log('> ', pageNum, ' page options: ', pageOptions.length);
 
@@ -106,9 +87,13 @@ async function scrapeMediaworld(product) {
     }
 
     console.log('>> Finished scraping product: ', product.name, ' with ', options.length, ' options scraped <<');
-
-    await browser.close();
-    return options;
+    
+    return options.map(option => {
+        return {
+            ...option,
+            condition: 'new'
+        }
+    });
 }
 
-module.exports = scrapeMediaworld;
+module.exports = {scrapeMediaworld, getMediaworldUrl};

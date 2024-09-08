@@ -7,12 +7,17 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://mongo:27017/price-compare # Connect to MongoDB container
+      - MONGO_URI=mongodb://mongo:27017/price-compare # Connect to MongoDB container ${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@
+    ports:
+      - "9222:9222"
+      - "3000:3000"
   mongo:
     image: mongo:latest
     env_file:
       - .env
     volumes:
       - mongo-data:/data/db
+    ports:
+      - "27017:27017"
 volumes:
   mongo-data:

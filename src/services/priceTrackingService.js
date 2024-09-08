@@ -1,59 +1,82 @@
-const { Product, Source, Price } = require('../db/db'); 
+const {getScraperFunctionAndUrl } = require('../utils/scraperUtils');
+const scraperService = require('./scraperService');
 const productRepository = require('../repositories/productRepository');
-const sourceRepository = require('../repositories/sourceRepository'); 
-const priceRepository = require('../repositories/priceRepository');
+const sourceRepository = require('../repositories/sourceRepository');
 
-const { scraperService } = require('./scraperService');
-const { getScraperFunction } = require('../utils/utils');
+async function trackProductPrice(sourceList=null, productList=null) {
+    console.log('>>>> Scraper service started');
 
+    scraperService.init();
 
-async function trackProductPrice(source=null, product=null) {
     try {
-        if (source && product) {
-            // 1. Get products to track (you might have a different logic for selecting products)
-            const productsToTrack = [product];
-        
-            // 1. Track prices for the sepcific product
-            console.log(`==-- Scraping prices from ${source.source} --==`);
-            const scraper = getScraperFunction(source.source);
-            await scraperService(productsToTrack, source, scraper);
-        
-            console.log('Price tracking completed successfully');
+        if (sourceList === null) {
+            console.log('Getting sources from database');
+            sourceList = await sourceRepository.getSources();
+        }
+        if (productList === null) {
+            console.log('Getting products from database');
+            productList = await productRepository.getProducts();
         }
 
-        if (source) {
-            // 1. Get products to track (you might have a different logic for selecting products)
-            const productsToTrack = await productRepository.getProducts(); 
-        
-            // 2. Track prices for each product
-            console.log(`==-- Scraping prices from ${source.source} --==`);
-            const scraper = getScraperFunction(source.source);
-            await scraperService(productsToTrack, source, scraper);
-        
-            console.log('Price tracking completed successfully');
+        console.log('>> Scraping from sources:', sourceList.map(source => source.source));
+        console.log('>> Scraping for products:', productList.map(product => product.name));
+        for (const source of sourceList) {
+            const scraperFunctions = getScraperFunctionAndUrl(source.source);
+            
+            let scrapeInfoList = [];
+            for (const product of productList) {
+                const searchUrls = scraperFunctions.getUrl(product);
+
+                for (let i = 0; i < searchUrls.length; i++) {
+                    const url = searchUrls[i];
+                
+                    const condition = i === 0 ? 'new' : 'used'; // First one is 'new', rest are 'used'
+                
+                    scrapeInfoList.push({
+                        source: source.source,
+                        product: product,
+                        url: url,
+                        condition: condition
+                    });
+                }
+
+            }
+
+            console.log('> Scraping ', scrapeInfoList.length, ' urls from ', source.source);
+            if (process.send) {
+                process.send({ type: 'update-status', status: 'running', progress: {source: source.source, completed: 0, total: scrapeInfoList.length} });
+            }
+
+            let i = 0;
+            for (const scrapeInfo of scrapeInfoList) {
+                await scraperService.scraperService(scrapeInfo, scraperFunctions.scraper, source.proxy);
+                i++;
+                if (process.send) {
+                    process.send({ type: 'update-status', status: 'running', progress: {completed: i} });
+                }
+            }
         }
-        
-        // 1. Get products to track (you might have a different logic for selecting products)
-        const productsToTrack = await productRepository.getProducts(); 
-    
-        // 2. Get sources to scrape from
-        const sourcesToScrape = await sourceRepository.getSources();
-    
-        for (const source of sourcesToScrape) {
-            // 3. Track prices for each product
-            console.log(`==-- Scraping prices from ${source.source} --==`);
-            const scraper = getScraperFunction(source.source);
-            await scraperService(productsToTrack, source, scraper);
-        }
-    
+
         console.log('Price tracking completed successfully');
-
-        return true;
+        
+        if (process.exit) {
+            process.exit(0);
+        }
+        return;
     } catch (err) {
         console.error('Error during price tracking:', err);
-        // Handle the error appropriately (e.g., log it, send notifications, etc.)
-        return false;
+        
+        if (process.exit) {
+            process.exit(1);
+        }
+        return;
     }
 }
 
-module.exports = trackProductPrice;
+const [sourceListArg, productListArg] = process.argv.slice(2);
+
+// Parse JSON strings, or set to null if not provided
+const sourceList = sourceListArg ? JSON.parse(sourceListArg) : null;
+const productList = productListArg ? JSON.parse(productListArg) : null;
+
+trackProductPrice(sourceList, productList);

@@ -2,7 +2,7 @@ const Product = require('../models/product');
 
 async function getProducts() {
   try {
-    const products = await Product.find(); 
+    const products = await Product.find().maxTimeMS(30000);; 
     return products;
   } catch (err) {
     console.error('Error getting products:', err);
