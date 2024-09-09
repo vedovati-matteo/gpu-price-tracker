@@ -21,6 +21,7 @@ class ScraperServer {
         this.app.use(bodyParser.json());
 
         this.app.post(`/bot${process.env.TELEGRAM_BOT_TOKEN}`, (req, res) => {
+            console.log('Received request body:', JSON.stringify(req.body));
             this.bot.handleUpdate(req.body);
             res.sendStatus(200);
         });

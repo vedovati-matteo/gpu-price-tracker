@@ -14,6 +14,7 @@ class TelegramBot {
     }
 
     handleUpdate(update) {
+        console.log('Received update:', JSON.stringify(update));
         if (update.message && update.message.text) {
             const chatId = update.message.chat.id;
             this.chatId = chatId;
