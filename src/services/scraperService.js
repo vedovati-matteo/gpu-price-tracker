@@ -20,19 +20,25 @@ class ScraperService {
   }
   
   async launchBrowser(headless = true) {
-    if (!headless) {
-        
+    console.log('Launching browser with headless mode:', headless);
+    try {
+      const browser = await puppeteer.launch({
+        headless,
+        args: [
+          '--remote-debugging-port='+process.env.PUPPETEER_DEBUG_PORT,
+          '--remote-debugging-address=0.0.0.0',
+          '--display=:99',
+          '--no-sandbox',
+          '--disable-setuid-sandbox'
+        ],
+        dumpio: true // This will pipe the browser process stdout and stderr to process.stdout and process.stderr
+      });
+      console.log('Browser launched successfully');
+      return browser;
+    } catch (error) {
+      console.error('Failed to launch browser:', error);
+      throw error;
     }
-    return puppeteer.launch({
-      headless,
-      args: [
-        '--remote-debugging-port='+process.env.PUPPETEER_DEBUG_PORT,
-        '--remote-debugging-address=0.0.0.0',
-        '--display=:99',
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ]
-    });
   }
 
   async setupPage(browser, url) {
