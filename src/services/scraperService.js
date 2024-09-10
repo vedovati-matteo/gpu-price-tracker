@@ -24,7 +24,6 @@ class ScraperService {
     try {
       const browser = await puppeteer.launch({
         headless,
-        executablePath: '/usr/bin/google-chrome-stable',
         args: [
           '--remote-debugging-port='+process.env.PUPPETEER_DEBUG_PORT,
           '--remote-debugging-address=0.0.0.0',
