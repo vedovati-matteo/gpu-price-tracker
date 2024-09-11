@@ -25,6 +25,8 @@ RUN apt-get update && \
     libu2f-udev \
     libvulkan1 \
     xvfb x11vnc x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable x11-apps \
+    dbus \
+    dbus-x11 \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
