@@ -30,7 +30,13 @@ class ScraperService {
           '--display=:99',
           '--disable-dev-shm-usage',
           '--no-sandbox',
-          '--disable-setuid-sandbox'
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--disable-software-rasterizer',
+          '--disable-gpu-sandbox',
+          '--disable-features=VizDisplayCompositor',
+          '--ignore-gpu-blocklist',
+          '--use-gl=swiftshader'
         ],
         dumpio: true // This will pipe the browser process stdout and stderr to process.stdout and process.stderr
       });

@@ -8,9 +8,12 @@ services:
       - mongo
     environment:
       - MONGO_URI=mongodb://mongo:27017/price-compare # Connect to MongoDB container ${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@
+      - DISPLAY=:0
     ports:
       - "9222:9222"
       - "3000:3000"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
   mongo:
     image: mongo:latest
     env_file:

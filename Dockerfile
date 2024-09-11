@@ -6,6 +6,15 @@ RUN apt-get update && \
     apt-get install -y \
     ca-certificates \
     fonts-liberation \
+    libgl1-mesa-glx \
+    libgles2-mesa \
+    libegl1-mesa \
+    libxrandr2 \
+    libxss1 \
+    libpci3 \
+    libasound2 \
+    libxtst6 \
+    libnss3 \
     libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -47,7 +56,8 @@ EXPOSE 3000
 EXPOSE 9222
 
 # Start the app
-CMD dbus-daemon --system && \
-    Xvfb :99 -ac & \
+CMD Xvfb :99 -ac -screen 0 1280x1024x16 & \
+    export DISPLAY=:99 && \
+    dbus-daemon --system && \
     x11vnc -forever -nopw -display :99 & \
-    DISPLAY=:99 node src/server.js
+    node src/server.js
