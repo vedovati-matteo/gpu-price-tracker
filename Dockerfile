@@ -47,4 +47,7 @@ EXPOSE 3000
 EXPOSE 9222
 
 # Start the app
-CMD Xvfb :99 -ac & x11vnc -forever -nopw -display :99 & DISPLAY=:99 node src/server.js
+CMD dbus-daemon --system && \
+    Xvfb :99 -ac & \
+    x11vnc -forever -nopw -display :99 & \
+    DISPLAY=:99 node src/server.js
