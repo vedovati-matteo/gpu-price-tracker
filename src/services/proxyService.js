@@ -6,12 +6,20 @@ async function checkProxy(proxy, url, headless = true) {
     const browser = await puppeteer.launch({
         headless: headless,
         args: [
-            `--proxy-server=${proxy}`,
-            `--remote-debugging-port=9222`,
-            `--remote-debugging-address=0.0.0.0`,
+            '--remote-debugging-port='+process.env.PUPPETEER_DEBUG_PORT,
+            '--remote-debugging-address=0.0.0.0',
             '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--disable-software-rasterizer',
+            '--disable-features=VizDisplayCompositor',
+            '--ignore-gpu-blocklist',
+            '--use-gl=swiftshader',
+            '--disable-vulkan',
+            '--disable-webgl',
+            '--display=:99'
+          ],
+        dumpio: true
     });
 
     const page = await browser.newPage();
