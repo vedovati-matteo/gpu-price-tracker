@@ -7,7 +7,7 @@ services:
     depends_on:
       - mongo
     environment:
-      - MONGO_URI=mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/price-compare # Connect to MongoDB container ${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@
+      - MONGO_URI=mongodb://${NONGO_PRICECOMPARE_USERNAME}:${NONGO_PRICECOMPARE_PASSWORD}@mongo:27017/price-compare # Connect to MongoDB container ${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@
       - DISPLAY=:0
     ports:
       - "9222:9222"
