@@ -50,7 +50,7 @@ async function addDailyProductPrices(productId, source, options) {
 
 async function getProductPrices(productId, source = null, date = null) {
     try {
-      const query = { productId };
+      const query = { productId: productId };
       if (source) {
         query.source = source;
       }
@@ -66,7 +66,59 @@ async function getProductPrices(productId, source = null, date = null) {
     }
   }
   
+async function getSourcePrices(source, date = null) {
+    try {
+        const query = { source: source };
+        if (date) {
+            query.date = date;
+        }
+
+        const prices = await Price.find(query);
+        return prices;
+    } catch (err) {
+        console.error('Error getting source prices:', err);
+        throw err;
+    }
+  }
+
+async function getDailyPrices(dateStr = null) {
+    try {
+      if (!dateStr) {
+        // get prices from last date possible, i.e. today if available, otherwise yesterday
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set time to midnight for consistent daily checks
+
+        let query = { date: today };
+        let prices = await Price.find(query);
+
+        if (prices.length > 0) {
+            return prices;
+        }
+        // If no prices found for today, get prices from yesterday
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0); // Set time to midnight for consistent daily checks
+        query.date = yesterday;
+
+        prices = await Price.find(query);
+        return prices;
+      } else { // dateStr format: 'YYYY-MM-DD'
+
+        const date = new Date(dateStr);
+        date.setHours(0, 0, 0, 0); // Set time to midnight for consistent daily checks
+        const query = { date: date };
+        const prices = await Price.find(query);
+        return prices;
+      }
+    } catch (err) {
+        console.error('Error getting daily prices:', err);
+        throw err;
+    }
+}
+
   module.exports = {
     addDailyProductPrices,
-    getProductPrices
+    getProductPrices,
+    getSourcePrices,
+    getDailyPrices
   };

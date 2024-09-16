@@ -22,5 +22,13 @@ services:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
+  frontend:
+    build:
+      context: ./src/web/my-app
+    ports:
+      - "3001:3001"
+    depends_on:
+      - app
+
 volumes:
   mongo-data:

@@ -17,6 +17,7 @@
     "mongoose": "^8.6.0",
     "node-cron": "^3.0.3",
     "puppeteer": "^23.2.1",
-    "puppeteer-screen-recorder": "^3.0.5"
+    "puppeteer-screen-recorder": "^3.0.5",
+    "recharts": "^2.12.7"
   }
 }
