@@ -47,17 +47,12 @@ export default function Home() {
   }, [])
 
   const fetchInitialData = async () => {
-    setIsLoading(true)
-    setError(null)
     try {
       const [productsData, sourcesData, currentPricesData] = await Promise.all([
         fetch('/api/next/products').then(res => res.json()),
         fetch('/api/next/sources').then(res => res.json()),
         fetch('/api/next/prices/current').then(res => res.json())
       ])
-      console.log('productsData:', productsData)
-      console.log('sourcesData:', sourcesData)
-      console.log('currentPricesData:', currentPricesData)
       setProducts(productsData)
       setSources(sourcesData)
       setCurrentPrices(currentPricesData)
@@ -65,14 +60,13 @@ export default function Home() {
     } catch (error) {
       console.error('Error fetching initial data:', error)
       setError('Failed to fetch initial data. Please try again later.')
-      setFilteredCurrentPrices([])
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    if (!isLoading && !error && currentPrices.prices) {
+    if (currentPrices.prices) {
       const filtered = currentPrices.prices.filter(price => {
         const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
         const sourceMatch = selectedSource === 'all' || price.source === selectedSource
@@ -80,7 +74,7 @@ export default function Home() {
       })
       setFilteredCurrentPrices(filtered)
     }
-  }, [selectedProduct, selectedSource, currentPrices, isLoading, error])
+  }, [selectedProduct, selectedSource, currentPrices])
 
   const fetchHistoricalData = async () => {
     if (selectedProduct === 'all' && selectedSource === 'all') {
@@ -88,15 +82,10 @@ export default function Home() {
       return
     }
 
-    setIsLoading(true)
-    setError(null)
     try {
-      let url
-      if (selectedProduct !== 'all') {
-        url = `/api/next/prices/product/${selectedProduct}`
-      } else if (selectedSource !== 'all') {
-        url = `/api/next/prices/source/${selectedSource}`
-      }
+      let url = selectedProduct !== 'all'
+        ? `/api/next/prices/product/${selectedProduct}`
+        : `/api/next/prices/source/${selectedSource}`
 
       const data = await fetch(url).then(res => res.json())
       const processedData = processHistoricalData(data)
@@ -104,8 +93,6 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching historical data:", error)
       setError('Failed to fetch historical data. Please try again later.')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -170,10 +157,6 @@ export default function Home() {
     return [];
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>
-  }
-
   if (error) {
     return <div>Error: {error}</div>
   }
@@ -218,7 +201,9 @@ export default function Home() {
                   </SelectContent>
                 </Select>
               </div>
-              {filteredCurrentPrices.length > 0 ? (
+              {isLoading ? (
+                <p>Loading current prices...</p>
+              ) : filteredCurrentPrices.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -230,7 +215,7 @@ export default function Home() {
                   <TableBody>
                     {filteredCurrentPrices.map((price, index) => (
                       <TableRow key={index}>
-                        <TableCell>{products.find(product => product.productId === price.productId)?.name || 'Unknown GPU'}</TableCell>
+                        <TableCell>{price.name || 'Unknown GPU'}</TableCell>
                         <TableCell>{price.source}</TableCell>
                         <TableCell>€{price.price}</TableCell>
                       </TableRow>
@@ -275,7 +260,9 @@ export default function Home() {
                 </Select>
               </div>
               {(selectedProduct !== 'all' || selectedSource !== 'all') ? (
-                historicalData.length > 0 ? (
+                isLoading ? (
+                  <p>Loading historical data...</p>
+                ) : historicalData.length > 0 ? (
                   <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={historicalData}>
