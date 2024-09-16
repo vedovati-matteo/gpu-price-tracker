@@ -46,6 +46,7 @@ export default function Home() {
 
   const fetchInitialData = async () => {
     try {
+      console.log('-----------------fetching init data');
       const [productsData, sourcesData, currentPricesData] = await Promise.all([
         fetch('/api/products').then(res => res.json()),
         fetch('/api/sources').then(res => res.json()),
@@ -167,7 +168,7 @@ export default function Home() {
         <TabsContent value="current">
           <Card>
             <CardHeader>
-              <CardTitle>Current GPU Prices ({new Date(currentPrices.date?.$date).toLocaleDateString()})</CardTitle>
+              <CardTitle>Current GPU Prices ({new Date(currentPrices.date).toLocaleDateString()})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex space-x-4 mb-4">
