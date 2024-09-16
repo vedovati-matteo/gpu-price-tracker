@@ -59,17 +59,18 @@ export default function Home() {
       setProducts(productsData)
       setSources(sourcesData)
       setCurrentPrices(currentPricesData)
-      setFilteredCurrentPrices(currentPricesData.prices)
+      setFilteredCurrentPrices(currentPricesData.prices || [])
     } catch (error) {
       console.error('Error fetching initial data:', error)
       setError('Failed to fetch initial data. Please try again later.')
+      setFilteredCurrentPrices([])
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    if (!isLoading && !error) {
+    if (!isLoading && !error && currentPrices.prices) {
       const filtered = currentPrices.prices.filter(price => {
         const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
         const sourceMatch = selectedSource === 'all' || price.source === selectedSource
