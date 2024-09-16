@@ -3,28 +3,39 @@ function extractNumber(str) {
   // Remove all non-numeric characters except for '.' and ','
   const cleanedStr = str.replace(/[^0-9.,]/g, '');
 
-  let standardizedStr;
-
-  // Check if there's more than one decimal separator
+  // Count occurrences of '.' and ','
   const dotCount = (cleanedStr.match(/\./g) || []).length;
   const commaCount = (cleanedStr.match(/,/g) || []).length;
 
-  if (dotCount <= 1 && commaCount <= 1) {
-    if (commaCount === 1 && dotCount === 0) {
-      // If there's only one comma and no dots, treat comma as decimal separator
-      standardizedStr = cleanedStr.replace(',', '.');
-    } else if (commaCount === 1 && dotCount === 1) {
-      // If there's both a comma and a dot, assume comma is thousands separator
-      standardizedStr = cleanedStr.replace(',', '');
+  let standardizedStr;
+
+  // Handle cases with no separators
+  if (dotCount + commaCount === 0) {
+    return parseFloat(cleanedStr);
+  }
+
+  // Handle cases with only one separator
+  if (dotCount + commaCount === 1) {
+    const parts = cleanedStr.split(/[.,]/);
+    // If the part after the separator has 3 digits, it's likely a thousands separator
+    if (parts[1] && parts[1].length === 3) {
+      return parseFloat(parts.join(''));
     } else {
-      // In all other cases, leave as is
-      standardizedStr = cleanedStr;
+      // Otherwise, treat it as a decimal separator
+      return parseFloat(cleanedStr.replace(',', '.'));
     }
+  }
+
+  // Handle cases with multiple separators
+  const parts = cleanedStr.split(/[.,]/);
+  
+  // Check if the last part has exactly 2 or 3 digits (common for cents)
+  if (parts[parts.length - 1].length === 2 || parts[parts.length - 1].length === 3) {
+    // Assume the last separator is the decimal point
+    standardizedStr = parts.slice(0, -1).join('') + '.' + parts[parts.length - 1];
   } else {
-    // If there are multiple dots or commas, assume last one is decimal separator
-    standardizedStr = cleanedStr.replace(/[.,]/g, (match, index, original) => 
-      index === original.lastIndexOf('.') || index === original.lastIndexOf(',') ? '.' : ''
-    );
+    // If not, assume it's a whole number with thousand separators
+    standardizedStr = parts.join('');
   }
 
   // Convert to a number, handling potential NaN
