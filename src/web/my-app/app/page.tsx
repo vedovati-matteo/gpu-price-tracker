@@ -46,7 +46,7 @@ export default function Home() {
   const [error, setError] = useState(null)
   const [sortColumn, setSortColumn] = useState('name')
   const [sortDirection, setSortDirection] = useState('asc')
-  onst [selectedCondition, setSelectedCondition] = useState('all')
+  const [selectedCondition, setSelectedCondition] = useState('all')
 
   const fetchData = useCallback(async () => {
     setIsLoading(true)
