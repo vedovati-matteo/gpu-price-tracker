@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
     
-    const res = await fetch('/api/prices/current');
+    const res = await fetch('http://app:3000/api/prices/current');
     const prices = await res.json();
     const response = {
       "date": prices[0].date,

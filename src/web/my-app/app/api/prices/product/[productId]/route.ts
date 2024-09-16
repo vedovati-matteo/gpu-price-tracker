@@ -6,7 +6,7 @@ export async function GET(
   ) {
     const productId = params.productId;
     
-    const res = await fetch(`/api/prices/product/${productId}`);
+    const res = await fetch(`http://app:3000/api/prices/product/${productId}`);
 
     const prices = await res.json();
 
