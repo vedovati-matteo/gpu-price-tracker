@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { Button } from '@/components/ui/button'
 import { RefreshCw, ArrowUpDown } from 'lucide-react'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 // Color utility functions
 const getSourceColor = (source) => {
@@ -45,6 +46,7 @@ export default function Home() {
   const [error, setError] = useState(null)
   const [sortColumn, setSortColumn] = useState('name')
   const [sortDirection, setSortDirection] = useState('asc')
+  onst [selectedCondition, setSelectedCondition] = useState('all')
 
   const fetchData = useCallback(async () => {
     setIsLoading(true)
@@ -177,12 +179,13 @@ export default function Home() {
       const filtered = currentPrices.prices.filter(price => {
         const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
         const sourceMatch = selectedSource === 'all' || price.source === selectedSource
-        return productMatch && sourceMatch
+        const conditionMatch = selectedCondition === 'all' || price.condition === selectedCondition
+        return productMatch && sourceMatch && conditionMatch
       })
       const sorted = sortData(filtered, sortColumn, sortDirection)
       setFilteredCurrentPrices(sorted)
     }
-  }, [selectedProduct, selectedSource, currentPrices, sortColumn, sortDirection, sortData])
+  }, [selectedProduct, selectedSource, selectedCondition, currentPrices, sortColumn, sortDirection, sortData])
 
   const handleSort = (column) => {
     setSortColumn(column)
@@ -193,6 +196,12 @@ export default function Home() {
     fetchData()
     if (selectedProduct !== 'all' || selectedSource !== 'all') {
       fetchHistoricalData()
+    }
+  }
+
+  const handleProductClick = (href) => {
+    if (href) {
+      window.open(href, '_blank', 'noopener,noreferrer')
     }
   }
 
@@ -244,6 +253,11 @@ export default function Home() {
                     ))}
                   </SelectContent>
                 </Select>
+                <ToggleGroup type="single" value={selectedCondition} onValueChange={(value) => setSelectedCondition(value || 'all')}>
+                  <ToggleGroupItem value="all">All</ToggleGroupItem>
+                  <ToggleGroupItem value="new">New</ToggleGroupItem>
+                  <ToggleGroupItem value="used">Used</ToggleGroupItem>
+                </ToggleGroup>
               </div>
               {isLoading ? (
                 <p>Loading current prices...</p>
@@ -267,7 +281,11 @@ export default function Home() {
                   </TableHeader>
                   <TableBody>
                     {filteredCurrentPrices.map((price, index) => (
-                      <TableRow key={index}>
+                      <TableRow 
+                        key={index} 
+                        className="cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleProductClick(price.href)}
+                      >
                         <TableCell>{price.name || 'Unknown GPU'}</TableCell>
                         <TableCell>{price.source}</TableCell>
                         <TableCell>€{price.price}</TableCell>
