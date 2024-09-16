@@ -43,6 +43,8 @@ export default function Home() {
   const [filteredCurrentPrices, setFilteredCurrentPrices] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [sortColumn, setSortColumn] = useState('name')
+  const [sortDirection, setSortDirection] = useState('asc')
 
   const fetchData = useCallback(async () => {
     setIsLoading(true)
@@ -68,17 +70,6 @@ export default function Home() {
   useEffect(() => {
     fetchData()
   }, [])
-
-  useEffect(() => {
-    if (currentPrices.prices) {
-      const filtered = currentPrices.prices.filter(price => {
-        const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
-        const sourceMatch = selectedSource === 'all' || price.source === selectedSource
-        return productMatch && sourceMatch
-      })
-      setFilteredCurrentPrices(filtered)
-    }
-  }, [selectedProduct, selectedSource, currentPrices])
 
   const fetchHistoricalData = useCallback(async () => {
     if (selectedProduct === 'all' && selectedSource === 'all') {
@@ -166,6 +157,38 @@ export default function Home() {
     return [];
   };
 
+  const sortData = useCallback((data, column, direction) => {
+    return [...data].sort((a, b) => {
+      if (column === 'name') {
+        return direction === 'asc' 
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      } else if (column === 'price') {
+        return direction === 'asc' 
+          ? a.price - b.price
+          : b.price - a.price;
+      }
+      return 0;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (currentPrices.prices) {
+      const filtered = currentPrices.prices.filter(price => {
+        const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
+        const sourceMatch = selectedSource === 'all' || price.source === selectedSource
+        return productMatch && sourceMatch
+      })
+      const sorted = sortData(filtered, sortColumn, sortDirection)
+      setFilteredCurrentPrices(sorted)
+    }
+  }, [selectedProduct, selectedSource, currentPrices, sortColumn, sortDirection, sortData])
+
+  const handleSort = (column) => {
+    setSortColumn(column)
+    setSortDirection(sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc')
+  }
+
   const handleRefresh = () => {
     fetchData()
     if (selectedProduct !== 'all' || selectedSource !== 'all') {
@@ -228,9 +251,18 @@ export default function Home() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>GPU</TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort('name')}>
+                          GPU <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </TableHead>
                       <TableHead>E-commerce</TableHead>
-                      <TableHead>Price</TableHead>
+                      <TableHead>
+                        <Button variant="ghost" onClick={() => handleSort('price')}>
+                          Price <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                      </TableHead>
+                      <TableHead>Condition</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -239,6 +271,7 @@ export default function Home() {
                         <TableCell>{price.name || 'Unknown GPU'}</TableCell>
                         <TableCell>{price.source}</TableCell>
                         <TableCell>€{price.price}</TableCell>
+                        <TableCell>{price.condition}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
