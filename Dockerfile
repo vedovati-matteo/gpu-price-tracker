@@ -51,18 +51,8 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Set the working directory for the Next.js app
-WORKDIR /app/src/web/my-app
-
-# Install frontend dependencies
-RUN npm install
-
-# Install concurrently to run multiple processes
-RUN npm install concurrently -g
-
 # Expose the port the app runs on (optional, depending on your app)
 EXPOSE 3000
-EXPOSE 3001
 EXPOSE 9222
 
 # Start the app
@@ -70,4 +60,4 @@ CMD Xvfb :99 -ac -screen 0 1280x1024x16 & \
     export DISPLAY=:99 && \
     dbus-daemon --session --fork && \
     x11vnc -forever -nopw -display :99 & \
-    concurrently "npm run dev --prefix src/web/my-app" "node src/server.js"
+    node src/server.js
