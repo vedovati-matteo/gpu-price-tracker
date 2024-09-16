@@ -13,7 +13,6 @@ class ScraperServer {
         this.bot = new TelegramBot();
         this.scheduler = new Scheduler(this.bot);
         this.bot.scheduler = this.scheduler;
-        this.api = new Api(this.app);
 
         mongoose.connect(process.env.MONGO_URI);
     }
@@ -28,8 +27,9 @@ class ScraperServer {
             res.sendStatus(200);
         });
 
+        const api = new Api(this.app);
         // Web app API routes
-        this.api.setupApiRoutes();
+        api.setupApiRoutes();
     }
 
     start() {
