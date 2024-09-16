@@ -55,7 +55,9 @@ export default function Home() {
         fetch('/api/sources').then(res => res.json()),
         fetch('/api/prices/current').then(res => res.json())
       ])
-
+      console.log('productsData:', productsData)
+      console.log('sourcesData:', sourcesData)
+      console.log('currentPricesData:', currentPricesData)
       setProducts(productsData)
       setSources(sourcesData)
       setCurrentPrices(currentPricesData)
