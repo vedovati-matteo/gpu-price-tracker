@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { Button } from '@/components/ui/button'
+import { RefreshCw } from 'lucide-react'
 
 // Color utility functions
 const getSourceColor = (source) => {
@@ -42,28 +44,30 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    fetchInitialData()
-  }, [])
-
-  const fetchInitialData = async () => {
+  const fetchData = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
     try {
       const [productsData, sourcesData, currentPricesData] = await Promise.all([
-        fetch('/api/next/products').then(res => res.json()),
-        fetch('/api/next/sources').then(res => res.json()),
-        fetch('/api/next/prices/current').then(res => res.json())
+        fetch('/api/next/products', { cache: 'no-store' }).then(res => res.json()),
+        fetch('/api/next/sources', { cache: 'no-store' }).then(res => res.json()),
+        fetch('/api/next/prices/current', { cache: 'no-store' }).then(res => res.json())
       ])
       setProducts(productsData)
       setSources(sourcesData)
       setCurrentPrices(currentPricesData)
       setFilteredCurrentPrices(currentPricesData.prices || [])
     } catch (error) {
-      console.error('Error fetching initial data:', error)
-      setError('Failed to fetch initial data. Please try again later.')
+      console.error('Error fetching data:', error)
+      setError('Failed to fetch data. Please try again later.')
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   useEffect(() => {
     if (currentPrices.prices) {
@@ -76,25 +80,34 @@ export default function Home() {
     }
   }, [selectedProduct, selectedSource, currentPrices])
 
-  const fetchHistoricalData = async () => {
+  const fetchHistoricalData = useCallback(async () => {
     if (selectedProduct === 'all' && selectedSource === 'all') {
       setHistoricalData([])
       return
     }
 
+    setIsLoading(true)
     try {
       let url = selectedProduct !== 'all'
         ? `/api/next/prices/product/${selectedProduct}`
         : `/api/next/prices/source/${selectedSource}`
 
-      const data = await fetch(url).then(res => res.json())
+      const data = await fetch(url, { cache: 'no-store' }).then(res => res.json())
       const processedData = processHistoricalData(data)
       setHistoricalData(processedData)
     } catch (error) {
       console.error("Error fetching historical data:", error)
       setError('Failed to fetch historical data. Please try again later.')
+    } finally {
+      setIsLoading(false)
     }
-  }
+  }, [selectedProduct, selectedSource])
+
+  useEffect(() => {
+    if (selectedProduct || selectedSource) {
+      fetchHistoricalData()
+    }
+  }, [selectedProduct, selectedSource, fetchHistoricalData])
 
   const processHistoricalData = (data) => {
     if (!data || data.length === 0) return []
@@ -119,12 +132,6 @@ export default function Home() {
       ...prices
     }))
   }
-
-  useEffect(() => {
-    if (selectedProduct || selectedSource) {
-      fetchHistoricalData()
-    }
-  }, [selectedProduct, selectedSource])
 
   const getChartLines = () => {
     if (selectedProduct !== 'all' && selectedSource !== 'all') {
@@ -159,13 +166,25 @@ export default function Home() {
     return [];
   };
 
+  const handleRefresh = () => {
+    fetchData()
+    if (selectedProduct !== 'all' || selectedSource !== 'all') {
+      fetchHistoricalData()
+    }
+  }
+
   if (error) {
     return <div>Error: {error}</div>
   }
 
   return (
     <main className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">GPU Price Tracker</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">GPU Price Tracker</h1>
+        <Button onClick={handleRefresh} disabled={isLoading}>
+          <RefreshCw className="mr-2 h-4 w-4" /> Refresh Data
+        </Button>
+      </div>
       
       <Tabs defaultValue="current">
         <TabsList>
