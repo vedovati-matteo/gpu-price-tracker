@@ -107,7 +107,9 @@ export default function Home() {
       if (selectedProduct !== 'all') {
         acc[date][item.source] = item.price
       } else {
-        acc[date][item.productId] = item.price
+        if (!acc[date][item.productId]) {
+          acc[date][item.productId] = item.price
+        }
       }
       return acc
     }, {})
@@ -148,7 +150,7 @@ export default function Home() {
         <Line 
           key={product.productId} 
           type="monotone" 
-          dataKey="price" 
+          dataKey={product.productId} 
           stroke={getProductColor(product.productId, selectedSource)} 
           name={product.name} 
         />
