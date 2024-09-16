@@ -39,14 +39,17 @@ export default function Home() {
   const [selectedSource, setSelectedSource] = useState('all')
   const [historicalData, setHistoricalData] = useState([])
   const [filteredCurrentPrices, setFilteredCurrentPrices] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     fetchInitialData()
   }, [])
 
   const fetchInitialData = async () => {
+    setIsLoading(true)
+    setError(null)
     try {
-      console.log('-----------------fetching init data');
       const [productsData, sourcesData, currentPricesData] = await Promise.all([
         fetch('/api/products').then(res => res.json()),
         fetch('/api/sources').then(res => res.json()),
@@ -59,26 +62,32 @@ export default function Home() {
       setFilteredCurrentPrices(currentPricesData.prices)
     } catch (error) {
       console.error('Error fetching initial data:', error)
+      setError('Failed to fetch initial data. Please try again later.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    // Filter current prices based on selected product and source
-    const filtered = currentPrices.prices.filter(price => {
-      const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
-      const sourceMatch = selectedSource === 'all' || price.source === selectedSource
-      return productMatch && sourceMatch
-    })
-    setFilteredCurrentPrices(filtered)
-  }, [selectedProduct, selectedSource, currentPrices])
+    if (!isLoading && !error) {
+      const filtered = currentPrices.prices.filter(price => {
+        const productMatch = selectedProduct === 'all' || price.productId === selectedProduct
+        const sourceMatch = selectedSource === 'all' || price.source === selectedSource
+        return productMatch && sourceMatch
+      })
+      setFilteredCurrentPrices(filtered)
+    }
+  }, [selectedProduct, selectedSource, currentPrices, isLoading, error])
 
   const fetchHistoricalData = async () => {
-    try {
-      if (selectedProduct === 'all' && selectedSource === 'all') {
-        setHistoricalData([])
-        return
-      }
+    if (selectedProduct === 'all' && selectedSource === 'all') {
+      setHistoricalData([])
+      return
+    }
 
+    setIsLoading(true)
+    setError(null)
+    try {
       let url
       if (selectedProduct !== 'all') {
         url = `/api/prices/product/${selectedProduct}`
@@ -91,6 +100,9 @@ export default function Home() {
       setHistoricalData(processedData)
     } catch (error) {
       console.error("Error fetching historical data:", error)
+      setError('Failed to fetch historical data. Please try again later.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
