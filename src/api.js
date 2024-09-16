@@ -5,7 +5,7 @@ const { getProducts } = require('./repositories/productRepository');
 
 class Api {
     constructor(app) {
-        this.app = app();
+        this.app = app;
     }
 
     setupApiRoutes() {
