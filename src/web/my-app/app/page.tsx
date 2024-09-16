@@ -51,9 +51,9 @@ export default function Home() {
     setError(null)
     try {
       const [productsData, sourcesData, currentPricesData] = await Promise.all([
-        fetch('http://localhost:3001/api/next/products').then(res => res.json()),
-        fetch('http://localhost:3001/api/next/sources').then(res => res.json()),
-        fetch('http://localhost:3001/api/next/prices/current').then(res => res.json())
+        fetch('/api/next/products').then(res => res.json()),
+        fetch('/api/next/sources').then(res => res.json()),
+        fetch('/api/next/prices/current').then(res => res.json())
       ])
       console.log('productsData:', productsData)
       console.log('sourcesData:', sourcesData)
@@ -93,9 +93,9 @@ export default function Home() {
     try {
       let url
       if (selectedProduct !== 'all') {
-        url = `http://localhost:3001/api/next/prices/product/${selectedProduct}`
+        url = `/api/next/prices/product/${selectedProduct}`
       } else if (selectedSource !== 'all') {
-        url = `http://localhost:3001/api/next/prices/source/${selectedSource}`
+        url = `/api/next/prices/source/${selectedSource}`
       }
 
       const data = await fetch(url).then(res => res.json())

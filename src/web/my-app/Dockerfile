@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 3001
 
 # Start the frontend (Next.js dev mode)
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "-p", "3001"]
