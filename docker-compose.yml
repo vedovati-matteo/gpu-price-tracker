@@ -27,6 +27,8 @@ services:
       context: ./src/web/my-app
     ports:
       - "3001:3001"
+    environment:
+      - PORT=3001
     depends_on:
       - app
 
