@@ -98,7 +98,7 @@ export default function Home() {
     if (!data || data.length === 0) return []
 
     const groupedData = data.reduce((acc, item) => {
-      const date = new Date(item.date.$date).toISOString().split('T')[0]
+      const date = new Date(item.date).toISOString().split('T')[0]
       if (!acc[date]) {
         acc[date] = {}
       }
@@ -155,6 +155,14 @@ export default function Home() {
     return [];
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
   return (
     <main className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">GPU Price Tracker</h1>
@@ -195,77 +203,85 @@ export default function Home() {
                   </SelectContent>
                 </Select>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>GPU</TableHead>
-                    <TableHead>E-commerce</TableHead>
-                    <TableHead>Price</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCurrentPrices.map((price, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{products.find(product => product.productId === price.productId)?.name || 'Unknown GPU'}</TableCell>
-                      <TableCell>{price.source}</TableCell>
-                      <TableCell>€{price.price}</TableCell>
+              {filteredCurrentPrices.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>GPU</TableHead>
+                      <TableHead>E-commerce</TableHead>
+                      <TableHead>Price</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredCurrentPrices.map((price, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{products.find(product => product.productId === price.productId)?.name || 'Unknown GPU'}</TableCell>
+                        <TableCell>{price.source}</TableCell>
+                        <TableCell>€{price.price}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <p>No data available for the selected filters.</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
         
         <TabsContent value="historical">
-        <Card>
-          <CardHeader>
-            <CardTitle>Historical Price Comparison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex space-x-4 mb-4">
-              <Select onValueChange={setSelectedProduct} value={selectedProduct}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select GPU" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All GPUs</SelectItem>
-                  {products.map(product => (
-                    <SelectItem key={product.productId} value={product.productId}>{product.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select onValueChange={setSelectedSource} value={selectedSource}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select E-commerce" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All E-commerce</SelectItem>
-                  {sources.map(source => (
-                    <SelectItem key={source.source} value={source.source}>{source.source}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {(selectedProduct !== 'all' || selectedSource !== 'all') ? (
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={historicalData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    {getChartLines()}
-                  </LineChart>
-                </ResponsiveContainer>
+          <Card>
+            <CardHeader>
+              <CardTitle>Historical Price Comparison</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex space-x-4 mb-4">
+                <Select onValueChange={setSelectedProduct} value={selectedProduct}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select GPU" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All GPUs</SelectItem>
+                    {products.map(product => (
+                      <SelectItem key={product.productId} value={product.productId}>{product.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select onValueChange={setSelectedSource} value={selectedSource}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select E-commerce" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All E-commerce</SelectItem>
+                    {sources.map(source => (
+                      <SelectItem key={source.source} value={source.source}>{source.source}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            ) : (
-              <p>Please select a GPU or an E-commerce site to view historical data.</p>
-            )}
-          </CardContent>
-        </Card>
-      </TabsContent>
+              {(selectedProduct !== 'all' || selectedSource !== 'all') ? (
+                historicalData.length > 0 ? (
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={historicalData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        {getChartLines()}
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <p>No historical data available for the selected filters.</p>
+                )
+              ) : (
+                <p>Please select a GPU or an E-commerce site to view historical data.</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </main>
   )
