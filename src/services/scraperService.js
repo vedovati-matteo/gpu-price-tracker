@@ -37,8 +37,8 @@ class ScraperService {
           '--disable-vulkan',
           '--disable-webgl',
           '--display=:99'
-        ],
-        dumpio: true // This will pipe the browser process stdout and stderr to process.stdout and process.stderr
+        ]
+        //dumpio: true // This will pipe the browser process stdout and stderr to process.stdout and process.stderr
       });
       console.log('Browser launched successfully');
       return browser;

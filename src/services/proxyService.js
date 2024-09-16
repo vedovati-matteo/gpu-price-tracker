@@ -18,8 +18,8 @@ async function checkProxy(proxy, url, headless = true) {
             '--disable-vulkan',
             '--disable-webgl',
             '--display=:99'
-          ],
-        dumpio: true
+          ]
+        //dumpio: true
     });
 
     const page = await browser.newPage();
