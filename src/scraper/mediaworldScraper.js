@@ -30,7 +30,9 @@ async function scrapeMediaworld(product, page, condition) {
         console.log('>', pageNum, 'scrolling to the bottom of the page');
         await humanScroll(page, 60000); // scroll to the bottom of the page or until 30 seconds have passed
         console.log('>', pageNum, 'scrolled to the bottom of the page');
+        const html = await page.content();
 
+        console.log('>>>> >> HTML page: ', html);
 
         try {
             await page.waitForFunction(() => {
