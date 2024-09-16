@@ -24,7 +24,7 @@ class Api {
 
         // Get prices for a specific GPU across all e-commerce sites
         this.app.get('/api/prices/product/:productName', async (req, res) => {
-            const { gpuName } = req.params;
+            const { productName } = req.params;
             const prices = await getProductPrices(gpuName);
             res.json(prices);
         });

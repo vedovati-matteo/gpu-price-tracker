@@ -28,8 +28,6 @@ export async function GET(
               }
           });
 
-          console.log(response)
-
           return NextResponse.json(response)
       } else {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })

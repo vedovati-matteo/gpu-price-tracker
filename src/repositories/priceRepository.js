@@ -48,12 +48,9 @@ async function addDailyProductPrices(productId, source, options) {
     }
 }
 
-async function getProductPrices(productId, source = null, date = null) {
+async function getProductPrices(productId, date = null) {
     try {
       const query = { productId: productId };
-      if (source) {
-        query.source = source;
-      }
       if (date) {
         query.date = date;
       }
