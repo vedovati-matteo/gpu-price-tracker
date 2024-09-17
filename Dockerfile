@@ -36,6 +36,7 @@ RUN apt-get update && \
     x11vnc \
     xvfb \
     novnc \
+    websockify \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
