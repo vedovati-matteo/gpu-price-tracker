@@ -112,7 +112,7 @@ class TelegramBot {
     }
 
     requestCaptchaSolving(type, link, targetId) {
-        this.sendMessage(this.chatId, `Solving ${type} needed:\n chrome://inspect\n IP and Port: ${link}\n TargetID: ${targetId}`);
+        this.sendMessage(this.chatId, `Solving ${type} needed: https://pricecoma.tech/novnc/vnc.html`);
         this.waitingForCaptcha = true;
     }
 
