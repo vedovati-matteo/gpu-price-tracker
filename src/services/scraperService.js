@@ -25,20 +25,10 @@ class ScraperService {
       const browser = await puppeteer.launch({
         headless,
         args: [
-          '--remote-debugging-port='+process.env.PUPPETEER_DEBUG_PORT,
-          '--remote-debugging-address=0.0.0.0',
           '--no-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--disable-software-rasterizer',
-          '--disable-features=VizDisplayCompositor',
-          '--ignore-gpu-blocklist',
-          '--use-gl=swiftshader',
-          '--disable-vulkan',
-          '--disable-webgl',
-          '--display=:99'
-        ]
-        //dumpio: true // This will pipe the browser process stdout and stderr to process.stdout and process.stderr
+          '--disable-setuid-sandbox'
+        ],
+        defaultViewport: null,
       });
       console.log('Browser launched successfully');
       return browser;

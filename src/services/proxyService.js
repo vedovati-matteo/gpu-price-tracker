@@ -4,23 +4,14 @@ const puppeteer = require('puppeteer');
 async function checkProxy(proxy, url, headless = true) {
     console.log('Checking proxy:', proxy);
     const browser = await puppeteer.launch({
-        headless: headless,
+        headless,
         args: [
-            '--remote-debugging-port='+process.env.PUPPETEER_DEBUG_PORT,
-            '--remote-debugging-address=0.0.0.0',
+            '--proxy-server=' + proxy,
             '--no-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--disable-software-rasterizer',
-            '--disable-features=VizDisplayCompositor',
-            '--ignore-gpu-blocklist',
-            '--use-gl=swiftshader',
-            '--disable-vulkan',
-            '--disable-webgl',
-            '--display=:99'
-          ]
-        //dumpio: true
-    });
+            '--disable-setuid-sandbox'
+        ],
+        defaultViewport: null,
+      });
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1920, height: 1080 });

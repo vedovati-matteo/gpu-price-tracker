@@ -33,11 +33,10 @@ RUN apt-get update && \
     xdg-utils \
     libu2f-udev \
     libvulkan1 \
-    xvfb x11vnc x11-xkb-utils xfonts-100dpi xfonts-75dpi xfonts-scalable x11-apps \
-    dbus \
-    dbus-x11 \
-    --no-install-recommends && \
-    rm -rf /var/lib/apt/lists/*
+    x11vnc \
+    xvfb \
+    novnc \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /app
@@ -51,13 +50,12 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on (optional, depending on your app)
-EXPOSE 3000
-EXPOSE 9222
+# Copy the start script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-# Start the app
-CMD Xvfb :99 -ac -screen 0 1280x1024x16 & \
-    export DISPLAY=:99 && \
-    dbus-daemon --session --fork && \
-    x11vnc -forever -nopw -display :99 & \
-    node src/server.js
+# Expose the port the app runs on
+EXPOSE 3000 5900 6080
+
+# Start the app using the start script
+CMD ["/start.sh"]
