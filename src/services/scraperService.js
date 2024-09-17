@@ -26,7 +26,10 @@ class ScraperService {
         headless,
         args: [
           '--no-sandbox',
-          '--disable-setuid-sandbox'
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--display=:99'  // Ensure Puppeteer is using the Xvfb display
         ],
         defaultViewport: null,
       });
