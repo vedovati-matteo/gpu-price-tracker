@@ -58,4 +58,4 @@ RUN chmod +x /start.sh
 EXPOSE 3000 5900 6080
 
 # Start the app using the start script
-CMD ["/start.sh"]
+CMD ["src/start.sh"]
