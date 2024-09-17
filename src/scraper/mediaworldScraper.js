@@ -32,8 +32,6 @@ async function scrapeMediaworld(product, page, condition) {
         console.log('>', pageNum, 'scrolled to the bottom of the page');
         const html = await page.content();
 
-        console.log('>>>> >> HTML page: ', html);
-
         try {
             await page.waitForFunction(() => {
                 const optionsCount = document.querySelector('div[data-test="mms-search-srp-productlist"]').children.length;

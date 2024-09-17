@@ -83,6 +83,8 @@ class ScraperService {
     const page = await checkProxy(proxy, scraperInfo.url, headless);
     if (!page.work) return false;
 
+    await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+
     const captchaInfo = await checkCaptcha(page.page);
     if (captchaInfo.isCaptchaPresent) {
       console.log('Captcha detected:', captchaInfo.captchaType);
