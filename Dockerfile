@@ -35,12 +35,16 @@ RUN apt-get update && \
     libvulkan1 \
     x11vnc \
     xvfb \
-    novnc \
     websockify \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /app
+
+# Manually install noVNC
+RUN git clone https://github.com/novnc/noVNC.git /usr/share/novnc && \
+    git clone https://github.com/novnc/websockify /usr/share/novnc/utils/websockify && \
+    ln -s /usr/share/novnc/utils/launch.sh /usr/local/bin/novnc
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
