@@ -80,7 +80,7 @@ class Scheduler {
                 : fork('src/services/priceTrackingService.js');
         }
 
-        
+        this.bot.scraperProcess = scraperProcess;
 
         scraperProcess.on('message', (message) => {
             if (message.type === 'update-status') {
