@@ -143,7 +143,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 📬 Contact
 
-For any queries or suggestions, please open an issue or contact the maintainer at [your-email@example.com](mailto:matteo.vedovati.77@gmail.com).
+For any queries or suggestions, please open an issue or contact the maintainer at [matteo.vedovati.77@gmail.com](mailto:matteo.vedovati.77@gmail.com).
 
 ---
 
