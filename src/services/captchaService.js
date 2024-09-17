@@ -13,7 +13,8 @@ async function checkCaptcha(page) {
         'div.h-captcha',            // hCaptcha
         'iframe[src*="challenge"]', // Cloudflare CAPTCHA iframe
         'img[src*="captcha"]',      // Simple image CAPTCHAs
-        'img[alt*="captcha"]'
+        'img[alt*="captcha"]',
+        'form.challenge-form',      // Cloudflare CAPTCHA form
     ];
 
     // Iterate over selectors to see if any CAPTCHA is present
@@ -53,6 +54,13 @@ async function checkCaptcha(page) {
         if (cloudflareCaptcha) {
             console.log('Cloudflare CAPTCHA detected');
             captchaType = 'Cloudflare CAPTCHA';
+        }
+
+        // Check for Cloudflare CAPTCHA
+        const cloudflareCaptchaForm = await page.$('form.challenge-form');
+        if (cloudflareCaptchaForm) {
+            console.log('Cloudflare CAPTCHA from detected');
+            captchaType = 'Cloudflare CAPTCHA form';
         }
 
         // If none of the above are detected, it remains unclassified
