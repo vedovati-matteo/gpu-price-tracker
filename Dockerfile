@@ -44,8 +44,7 @@ WORKDIR /app
 
 # Manually install noVNC
 RUN git clone https://github.com/novnc/noVNC.git /usr/share/novnc && \
-    git clone https://github.com/novnc/websockify /usr/share/novnc/utils/websockify && \
-    ln -s /usr/share/novnc/utils/launch.sh /usr/local/bin/novnc
+    git clone https://github.com/novnc/websockify /usr/share/novnc/utils/websockify
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
