@@ -51,11 +51,11 @@ RUN npm install
 COPY . .
 
 # Copy the start script
-COPY start.sh /start.sh
+COPY src/start.sh /start.sh
 RUN chmod +x /start.sh
 
 # Expose the port the app runs on
 EXPOSE 3000 5900 6080
 
 # Start the app using the start script
-CMD ["src/start.sh"]
+CMD ["/start.sh"]
