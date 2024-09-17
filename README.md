@@ -45,27 +45,39 @@ The project follows a modular architecture, separating concerns for improved mai
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/gpu-price-tracker.git
+   git clone https://github.com/vedovati-matteo/PriceCompare.git
    ```
 
 2. Install dependencies:
    ```
-   cd gpu-price-tracker
+   cd PriceCompare
    npm install
    ```
 
 3. Set up environment variables:
+    Craete the .env file in the root directory and add the following variables:
+    ```
+   MONGO_INITDB_ROOT_USERNAME=...
+    MONGO_INITDB_ROOT_PASSWORD=...
+    MONGO_PRICECOMPARE_USERNAME=...
+    MONGO_PRICECOMPARE_PASSWORD=...
+    TELEGRAM_BOT_TOKEN=...
+    PORT=3000
    ```
-   cp .env.example .env
-   # Edit .env with your configurations
-   ```
+   Replace the `...` with your actual values. These variables are crucial for:
+
+    - Connecting to your MongoDB instance
+    - Authenticating your Telegram bot
+    - Setting the port for your application
 
 4. Start the application:
    ```
    docker-compose up -d
    ```
 
-5. Access the web interface at `http://localhost:3000`
+5. Access the application:
+- Backend server: `http://localhost:3000`
+- Frontend interface: `http://localhost:3001`
 
 ## 🧠 Advanced Features
 
@@ -131,8 +143,8 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 📬 Contact
 
-For any queries or suggestions, please open an issue or contact the maintainer at [your-email@example.com](mailto:your-email@example.com).
+For any queries or suggestions, please open an issue or contact the maintainer at [your-email@example.com](mailto:matteo.vedovati.77@gmail.com).
 
 ---
 
-Built with ❤️ by [Your Name]
+Built with ❤️ by Matteo Vedovati
