@@ -6,7 +6,7 @@ const sourceRepository = require('../repositories/sourceRepository');
 async function trackProductPrice(sourceList=null, productList=null) {
     console.log('>>>> Scraper service started');
 
-    scraperService.init();
+    await scraperService.init();
 
     try {
         if (sourceList === null) {
