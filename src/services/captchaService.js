@@ -15,6 +15,7 @@ async function checkCaptcha(page) {
         'img[src*="captcha"]',      // Simple image CAPTCHAs
         'img[alt*="captcha"]',
         'form.challenge-form',      // Cloudflare CAPTCHA form
+        'a[href*="cloudflare.com"]'
     ];
 
     // Iterate over selectors to see if any CAPTCHA is present
@@ -61,6 +62,13 @@ async function checkCaptcha(page) {
         if (cloudflareCaptchaForm) {
             console.log('Cloudflare CAPTCHA from detected');
             captchaType = 'Cloudflare CAPTCHA form';
+        }
+
+        // Check for Cloudflare CAPTCHA
+        const cloudflareCaptchaLink = await page.$('a[href*="cloudflare.com"]');
+        if (cloudflareCaptchaLink) {
+            console.log('Cloudflare CAPTCHA link detected');
+            captchaType = 'Cloudflare CAPTCHA link';
         }
 
         // If none of the above are detected, it remains unclassified
