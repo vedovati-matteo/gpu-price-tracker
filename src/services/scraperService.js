@@ -83,7 +83,11 @@ class ScraperService {
     const page = await checkProxy(proxy, scraperInfo.url, headless);
     if (!page.work) return false;
     try {
-      await page.waitForNavigation({ timeout: 30000 }); // Wait for navigation to finish}
+      // Wait for the page to load
+      await page.waitForNavigation({ waitUntil: 'networkidle0' });
+
+      // Wait a bit longer to ensure dynamic content is loaded
+      await page.waitForTimeout(2000);
     } catch (error) {
       console.error('Page not loaded: ', error);
       return false;
