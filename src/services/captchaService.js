@@ -17,8 +17,6 @@ async function checkCaptcha(page) {
         'form.challenge-form',      // Cloudflare CAPTCHA form
     ];
 
-    await page.waitForNavigation(); // Wait for navigation to finish
-    
     // Iterate over selectors to see if any CAPTCHA is present
     for (let selector of captchaSelectors) {
         const element = await page.$(selector);

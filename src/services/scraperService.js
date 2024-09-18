@@ -82,8 +82,12 @@ class ScraperService {
   async handleProxy(scraperInfo, scraper, proxy, headless = true) {
     const page = await checkProxy(proxy, scraperInfo.url, headless);
     if (!page.work) return false;
-
-    await new Promise(resolve => setTimeout(resolve, 10000)); // Wait for 10 seconds
+    try {
+      await page.waitForNavigation({ timeout: 30000 }); // Wait for navigation to finish}
+    } catch (error) {
+      console.error('Page not loaded');
+      return false;
+    }
 
     const captchaInfo = await checkCaptcha(page.page);
     if (captchaInfo.isCaptchaPresent) {
