@@ -97,7 +97,7 @@ class ScraperService {
     if (!page.work) return false;
     try {
       // Wait for the page to load
-      await waitForPageLoad(page.page);
+      await this.waitForPageLoad(page.page);
 
       // Wait a bit longer to ensure dynamic content is loaded
       await page.waitForTimeout(2000);
