@@ -79,12 +79,25 @@ class ScraperService {
     console.log(`Saved ${validOptions.length} prices for product ${product.name}`);
   }
 
+  // Function to check if the page has finished loading
+  async waitForPageLoad(page) {
+    await page.evaluate(() => {
+        return new Promise((resolve) => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+    });
+  }
+
   async handleProxy(scraperInfo, scraper, proxy, headless = true) {
     const page = await checkProxy(proxy, scraperInfo.url, headless);
     if (!page.work) return false;
     try {
       // Wait for the page to load
-      await page.waitForNavigation({ waitUntil: 'networkidle0' });
+      await waitForPageLoad(page.page);
 
       // Wait a bit longer to ensure dynamic content is loaded
       await page.waitForTimeout(2000);
