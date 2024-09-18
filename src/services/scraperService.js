@@ -122,6 +122,9 @@ class ScraperService {
       }
     }
 
+    const html = await page.page.content();
+    print(html);
+
     const options = await scraper(scraperInfo.product, page.page, scraperInfo.condition);
     await page.browser.close();
 
