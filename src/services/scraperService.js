@@ -100,7 +100,7 @@ class ScraperService {
       await this.waitForPageLoad(page.page);
 
       // Wait a bit longer to ensure dynamic content is loaded
-      await page.waitForTimeout(2000);
+      await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (error) {
       console.error('Page not loaded: ', error);
       return false;
