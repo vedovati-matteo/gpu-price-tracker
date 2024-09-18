@@ -45,7 +45,7 @@ The project follows a modular architecture, separating concerns for improved mai
 
 1. Clone the repository:
    ```
-   git clone https://github.com/vedovati-matteo/PriceCompare.git
+   git clone https://github.com/vedovati-matteo/gpu-price-tracker.git
    ```
 
 2. Install dependencies:
