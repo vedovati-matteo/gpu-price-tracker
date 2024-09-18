@@ -85,7 +85,7 @@ class ScraperService {
     try {
       await page.waitForNavigation({ timeout: 30000 }); // Wait for navigation to finish}
     } catch (error) {
-      console.error('Page not loaded');
+      console.error('Page not loaded: ', error);
       return false;
     }
 
