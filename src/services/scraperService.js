@@ -21,18 +21,35 @@ class ScraperService {
   
   async launchBrowser(headless = true) {
     console.log('Launching browser with headless mode:', headless);
+    let browser;
     try {
-      const browser = await puppeteer.launch({
-        headless,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--display=:99'  // Ensure Puppeteer is using the Xvfb display
-        ],
-        defaultViewport: null,
-      });
+      if (process.env.CLIENT_PROXY) {
+        browser = await puppeteer.launch({
+          headless,
+          args: [
+            '--proxy-server=' + process.env.CLIENT_PROXY,
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--display=:99'  // Ensure Puppeteer is using the Xvfb display
+          ],
+          defaultViewport: null,
+        });
+      } else {
+        browser = await puppeteer.launch({
+          headless,
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
+            '--display=:99'  // Ensure Puppeteer is using the Xvfb display
+          ],
+          defaultViewport: null,
+        });
+      }
+      
       console.log('Browser launched successfully');
       return browser;
     } catch (error) {
@@ -121,9 +138,6 @@ class ScraperService {
         return false;
       }
     }
-
-    const html = await page.page.content();
-    console.log(html);
 
     const options = await scraper(scraperInfo.product, page.page, scraperInfo.condition);
     await page.browser.close();
