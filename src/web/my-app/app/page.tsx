@@ -181,13 +181,15 @@ export default function Home() {
   const sortData = useCallback((data, column, direction) => {
     return [...data].sort((a, b) => {
       if (column === 'name') {
+        const nameA = a.name || ''; // Provide a default value if name is undefined
+        const nameB = b.name || ''; // Provide a default value if name is undefined
         return direction === 'asc' 
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name);
+          ? nameA.localeCompare(nameB)
+          : nameB.localeCompare(nameA);
       } else if (column === 'price') {
         return direction === 'asc' 
-          ? a.price - b.price
-          : b.price - a.price;
+          ? (a.price || 0) - (b.price || 0)  // Ensure undefined prices don't break sorting
+          : (b.price || 0) - (a.price || 0);
       }
       return 0;
     });
