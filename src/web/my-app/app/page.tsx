@@ -103,28 +103,47 @@ export default function Home() {
   }, [selectedProduct, selectedSource, fetchHistoricalData])
 
   const processHistoricalData = (data) => {
-    if (!data || data.length === 0) return []
-
+    if (!data || data.length === 0) return [];
+  
+    // Group data by date
     const groupedData = data.reduce((acc, item) => {
-      const date = new Date(item.date).toISOString().split('T')[0]
+      const date = new Date(item.date).toISOString().split('T')[0];
       if (!acc[date]) {
-        acc[date] = {}
+        acc[date] = {};
       }
-      if (selectedProduct !== 'all') {
-        acc[date][item.source] = item.price
-      } else {
-        if (!acc[date][item.productId]) {
-          acc[date][item.productId] = item.price
-        }
-      }
-      return acc
-    }, {})
-
-    return Object.entries(groupedData).map(([date, prices]) => ({
-      date,
-      ...prices
-    }))
-  }
+      acc[date][item.source] = item.price;
+      return acc;
+    }, {});
+  
+    // Get the date range based on the min and max dates
+    const allDates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
+    const startDate = new Date(allDates[0]);
+    const endDate = new Date(allDates[allDates.length - 1]);
+  
+    // Helper function to add days to a date
+    const addDays = (date, days) => {
+      const result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    };
+  
+    // Generate an array of dates between the start and end dates
+    let dateList = [];
+    for (let d = startDate; d <= endDate; d = addDays(d, 1)) {
+      const formattedDate = d.toISOString().split('T')[0];
+      dateList.push(formattedDate);
+    }
+  
+    // Fill missing dates with null prices
+    const filledData = dateList.map((date) => {
+      return {
+        date,
+        ...groupedData[date] // If there's no data for the date, it will remain undefined (null)
+      };
+    });
+  
+    return filledData;
+  };
 
   const getChartLines = () => {
     if (selectedProduct !== 'all' && selectedSource !== 'all') {
