@@ -5,6 +5,7 @@ class Scheduler {
     constructor(bot) {
         this.bot = bot;
         this.scrapeTime = '16:00';
+        this.cronJobs = []; // Initialize the cronJobs array
         this.setupCronJob();
     }
 
@@ -53,16 +54,18 @@ class Scheduler {
         this.bot.scrapeDate = today ? now : new Date(now.setDate(now.getDate() + 1));
         
         // Schedule the 10-minute reminder before the scraping run
-        this.cronJobs.push(cron.schedule(reminderCronExpression, () => {
+        const reminderJob = cron.schedule(reminderCronExpression, () => {
             this.bot.sendMessage(this.bot.chatId, 'Scraping will start in 10 minutes!');
-        }));
+        });
+        this.cronJobs.push(reminderJob);
         
         // Schedule the scraping task
-        this.cronJobs.push(cron.schedule(cronExpression, () => {
+        const scrapingJob = cron.schedule(cronExpression, () => {
             this.bot.sendMessage(this.bot.chatId, 'Starting the daily scraping run...');
             this.runScraper();
             this.scheduleScraper(this.bot.scrapeTime, false); // Recursively schedule for tomorrow after today's run
-        }));
+        });
+        this.cronJobs.push(scrapingJob);
     }
 
     getTomorrowCronExpression(time) {
