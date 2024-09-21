@@ -10,28 +10,38 @@ import { Button } from '@/components/ui/button'
 import { RefreshCw, ArrowUpDown } from 'lucide-react'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
-// Color utility functions
+const getProductColor = (productId, source) => {
+  const colors = {
+    ebay: {
+      'gpu-1': '#81C784',
+      'gpu-2': '#4CAF50',
+      'gpu-3': '#388E3C',
+      'gpu-4': '#1B5E20'
+    },
+    'hardware-planet': {
+      'gpu-1': '#7986CB',
+      'gpu-2': '#3F51B5',
+      'gpu-3': '#303F9F',
+      'gpu-4': '#1A237E'
+    },
+    mediaworld: {
+      'gpu-1': '#E57373',
+      'gpu-2': '#F44336',
+      'gpu-3': '#D32F2F',
+      'gpu-4': '#B71C1C'
+    }
+  };
+
+  return colors[source]?.[productId] || '#000000'; // Default to black if color not found
+}
+
 const getSourceColor = (source) => {
   switch(source) {
-    case 'ebay': return '#00FF00'; // Green
-    case 'mediaworld': return '#FF0000'; // Red
-    case 'hardware-planet': return '#0000FF'; // Blue
+    case 'ebay': return '#4CAF50'; // Medium green
+    case 'mediaworld': return '#F44336'; // Medium red
+    case 'hardware-planet': return '#3F51B5'; // Medium blue
     default: return '#000000'; // Black for unknown sources
   }
-}
-
-const getProductColor = (productId, source) => {
-  const baseColor = getSourceColor(source);
-  const productNumber = parseInt(productId.split('-')[1]);
-  const opacity = 1 - (productNumber - 1) * 0.2; // 1, 0.8, 0.6, 0.4 for gpu-1 to gpu-4
-  return adjustColorOpacity(baseColor, opacity);
-}
-
-const adjustColorOpacity = (color, opacity) => {
-  const r = parseInt(color.slice(1, 3), 16);
-  const g = parseInt(color.slice(3, 5), 16);
-  const b = parseInt(color.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 export default function Home() {
@@ -143,7 +153,7 @@ export default function Home() {
           key={source.source} 
           type="monotone" 
           dataKey={source.source} 
-          stroke={getSourceColor(source.source)} 
+          stroke={getProductColor(selectedProduct, source.source)} 
           name={source.source} 
           connectNulls={true}
         />
