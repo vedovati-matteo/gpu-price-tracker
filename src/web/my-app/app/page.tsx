@@ -111,38 +111,20 @@ export default function Home() {
       if (!acc[date]) {
         acc[date] = {};
       }
-      acc[date][item.source] = item.price;
+      if (selectedProduct !== 'all') {
+        acc[date][item.source] = item.price;
+      } else {
+        acc[date][item.productId] = item.price;
+      }
       return acc;
     }, {});
   
-    // Get the date range based on the min and max dates
-    const allDates = Object.keys(groupedData).sort((a, b) => new Date(a) - new Date(b));
-    const startDate = new Date(allDates[0]);
-    const endDate = new Date(allDates[allDates.length - 1]);
+    // Convert grouped data to array and sort by date
+    const sortedData = Object.entries(groupedData)
+      .map(([date, prices]) => ({ date, ...prices }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
   
-    // Helper function to add days to a date
-    const addDays = (date, days) => {
-      const result = new Date(date);
-      result.setDate(result.getDate() + days);
-      return result;
-    };
-  
-    // Generate an array of dates between the start and end dates
-    let dateList = [];
-    for (let d = startDate; d <= endDate; d = addDays(d, 1)) {
-      const formattedDate = d.toISOString().split('T')[0];
-      dateList.push(formattedDate);
-    }
-  
-    // Fill missing dates with null prices
-    const filledData = dateList.map((date) => {
-      return {
-        date,
-        ...groupedData[date] // If there's no data for the date, it will remain undefined (null)
-      };
-    });
-  
-    return filledData;
+    return sortedData;
   };
 
   const getChartLines = () => {
@@ -153,6 +135,7 @@ export default function Home() {
         dataKey={selectedSource} 
         stroke={getProductColor(selectedProduct, selectedSource)} 
         name={`${selectedProduct} - ${selectedSource}`} 
+        connectNulls={true}
       />];
     } else if (selectedProduct !== 'all') {
       return sources.map((source) => (
@@ -162,6 +145,7 @@ export default function Home() {
           dataKey={source.source} 
           stroke={getSourceColor(source.source)} 
           name={source.source} 
+          connectNulls={true}
         />
       ));
     } else if (selectedSource !== 'all') {
@@ -172,6 +156,7 @@ export default function Home() {
           dataKey={product.productId} 
           stroke={getProductColor(product.productId, selectedSource)} 
           name={product.name} 
+          connectNulls={true}
         />
       ));
     }
@@ -353,27 +338,27 @@ export default function Home() {
                 </Select>
               </div>
               {(selectedProduct !== 'all' || selectedSource !== 'all') ? (
-                isLoading ? (
-                  <p>Loading historical data...</p>
-                ) : historicalData.length > 0 ? (
-                  <div className="h-[400px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={historicalData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        {getChartLines()}
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                ) : (
-                  <p>No historical data available for the selected filters.</p>
-                )
+              isLoading ? (
+                <p>Loading historical data...</p>
+              ) : historicalData.length > 0 ? (
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={historicalData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      {getChartLines()}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
               ) : (
-                <p>Please select a GPU or an E-commerce site to view historical data.</p>
-              )}
+                <p>No historical data available for the selected filters.</p>
+              )
+            ) : (
+              <p>Please select a GPU or an E-commerce site to view historical data.</p>
+            )}
             </CardContent>
           </Card>
         </TabsContent>
