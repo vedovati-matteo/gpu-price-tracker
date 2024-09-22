@@ -33,7 +33,8 @@ const commandHandlers = {
             bot.scheduler.runScraper(sourceObj);
             bot.sendMessage(chatId, `The scraper is executing your request of scraping the GPUs of ${source}.`);
         } else {
-            if (bot.scrapeDate == new Date()) {
+            const now = new Date();
+            if (bot.scrapeDate.toDateString() == now.toDateString()) {
                 bot.scheduler.runNow();
                 bot.sendMessage(chatId, 'The daily scraping is running now.');
             } else {
