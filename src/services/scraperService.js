@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const mongoose = require('mongoose');
 const { spawn } = require('child_process');
 const priceRepository = require('../repositories/priceRepository');
-const { extractNumber, isCorrectGPU } = require('../utils/cleanupUtils');
+const { extractNumber, isCorrectGPU, isPriceCorrect} = require('../utils/cleanupUtils');
 const { getProxies } = require('../utils/proxyUtils');
 const { getUserAgent } = require('../utils/scraperUtils');
 const { checkProxy } = require('./proxyService');
@@ -83,6 +83,7 @@ class ScraperService {
       .map(option => {
         const price = extractNumber(option.price);
         if (!isCorrectGPU(option.name, product)) return null;
+        if (!isPriceCorrect(price, product)) return null;
         return { name: option.name, price, href: option.href, condition: option.condition };
       })
       .filter(Boolean);

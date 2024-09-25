@@ -80,7 +80,25 @@ function isCorrectGPU(gpuName, product) {
   return vramCheck && rtxCheck && gtxCheck && gpuNumberCheck && tiCheck && superCheck;
 }
 
+function isPriceCorrect(price, product) {
+  productId = product.productId;
+  if (productId == "gpu-1") {
+    return price >= 125;
+  }
+  if (productId == "gpu-2") {
+    return price >= 250;
+  }
+  if (productId == "gpu-3") {
+    return price >= 450;
+  }
+  if (productId == "gpu-4") {
+    return price >= 750;
+  }
+  return true;
+}
+
 module.exports = {
     extractNumber,
-    isCorrectGPU
+    isCorrectGPU,
+    isPriceCorrect
   };
