@@ -29,6 +29,9 @@ async function scrapeEbay(product, page, condition) {
 
     let options = await page.evaluate(() => {
         const ul = document.querySelector('ul.srp-results.srp-list');
+        if (!ul) {
+            return [];
+        }
 
         // Get all child li elements
         const allLiElements = ul.querySelectorAll('li');
