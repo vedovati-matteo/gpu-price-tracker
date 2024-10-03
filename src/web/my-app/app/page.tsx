@@ -79,10 +79,6 @@ export default function Home() {
     }
   }, [])
 
-  useEffect(() => {
-    fetchData()
-  }, [])
-
   const fetchHistoricalData = useCallback(async () => {
     if (selectedProduct === 'all' && selectedSource === 'all') {
       setHistoricalData([])
@@ -106,8 +102,14 @@ export default function Home() {
     }
   }, [selectedProduct, selectedSource])
 
+  // Initial data fetch
   useEffect(() => {
-    if (selectedProduct || selectedSource) {
+    fetchData()
+  }, [fetchData])
+
+  // Fetch historical data when selections change or when data is refreshed
+  useEffect(() => {
+    if (selectedProduct !== 'all' || selectedSource !== 'all') {
       fetchHistoricalData()
     }
   }, [selectedProduct, selectedSource, fetchHistoricalData])
@@ -208,12 +210,12 @@ export default function Home() {
     setSortDirection(sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc')
   }
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     fetchData()
     if (selectedProduct !== 'all' || selectedSource !== 'all') {
       fetchHistoricalData()
     }
-  }
+  }, [fetchData, fetchHistoricalData, selectedProduct, selectedSource])
 
   const handleProductClick = (href) => {
     if (href) {
@@ -320,7 +322,12 @@ export default function Home() {
         <TabsContent value="historical">
           <Card>
             <CardHeader>
-              <CardTitle>Historical Price Comparison</CardTitle>
+              <CardTitle className="flex justify-between items-center">
+                <span>Historical Price Comparison</span>
+                <Button onClick={handleRefresh} disabled={isLoading} size="sm">
+                  <RefreshCw className="mr-2 h-4 w-4" /> Refresh
+                </Button>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex space-x-4 mb-4">
