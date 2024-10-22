@@ -27,6 +27,13 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
+    restart: always    # Add this line
+    healthcheck:      # Add this health check
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     depends_on:
       - app
 
